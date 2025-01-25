@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Validator;
 use App\Models\User;
 use Hash;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
@@ -36,6 +37,63 @@ class AuthController extends Controller
                 return response()->json(['status' => false, 'message' => 'Error']);
             }
     }
+    function getuser(){
+        try {
+            $users = User::get();
+            return response()->json(['status' => true, 'data' => $users]);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'Error']);
+        }
+    }
 
+    function getuserid($id){
+        try {
+            $users = User::where('id',$id)->first();
+            return response()->json(['status' => true, 'data' => $users]);
+        } catch (Exepciton $e) {
+            return response()->json(['status' => false, 'message'=>'gagal load data detail user. '. $e,
+        ]);
+        }
+    }
+
+    function update($id, Request $request){
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email'=>['required', Rule::unique('users')->ignore($id)],
+            'password' => 'min:8',
+            'role' => 'required',
+            'Adrees' => 'required',
+            'phone' => 'required',
+
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->messages]);
+        }
+        $data = [
+            'name'=>$request->get('name'),
+            'email'=>$request->get('email'),
+            'password'=>Hash::make($request->get('password')),
+            'role'=>$request->get('role'),
+            'Adrees'=>$request->get('Adrees'),
+            'phone'=>$request->get('phone'),
+        ];
+
+        try {
+            $update = User::where('id', $id)->update($data);
+            return response()->json(['status' => true, 'message' => 'User updated successfully']);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'Error']);
+        }
+    }
+
+    function delete($id){
+        try {
+            $delete = User::where('id', $id)->delete();
+            return response()->json(['status' => true, 'message' => 'User deleted successfully']);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'Error']);
+        }
+    }
 
 }

@@ -15,3 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::post("register_admin",[AuthController::class,"register"]);
+Route::get("get_user",[AuthController::class,"getuser"]);
+Route::get("get_user_id/{id}",[AuthController::class,"getuserid"]);
+Route::put("update_user/{id}",[AuthController::class,"update"]);
+Route::delete("delete/{id}",[AuthController::class,"delete"]);
