@@ -19,3 +19,5 @@ Route::get("get_user",[AuthController::class,"getuser"]);
 Route::get("get_user_id/{id}",[AuthController::class,"getuserid"]);
 Route::put("update_user/{id}",[AuthController::class,"update"]);
 Route::delete("delete/{id}",[AuthController::class,"delete"]);
+Route::post("login",[AuthController::class,"login"]);
+Route::get("logout",[AuthController::class,"logout"]);

@@ -7,6 +7,7 @@ use Validator;
 use App\Models\User;
 use Hash;
 use Illuminate\Validation\Rule;
+use Auth;
 
 class AuthController extends Controller
 {
@@ -94,6 +95,42 @@ class AuthController extends Controller
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'message' => 'Error']);
         }
+    }
+
+    function login(Request $request){
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email',
+            'password' => 'required|string|min:8',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'status'=>false,
+                'message'=>$validator->errors(),
+            ]);
+        }
+        $credentials = $request->only('email', 'password');
+        $token = Auth::guard('api')->attempt($credentials);
+        if (!$token) {
+            return response()->json(['status' => false, 'message' => 'Invalid credentials'],);
+        }
+
+        $users = Auth::guard('api')->user();
+        return response()->json([
+            'status'=> true,
+            'message'=> "ye login",
+            'data'=>$users,
+            'authorisation'=>[
+                'token'=>$token,
+            ]
+        ]);
+    }
+
+    function logout(){
+        Auth::guard('api')->logout();
+        return response()->json([
+            'status'=>true,
+            'message'=>'User logged out successfully',
+        ]);
     }
 
 }
